@@ -1,7 +1,7 @@
 import pandas
 
 # Read the CSV file into a pandas DataFrame
-metlin = pandas.read_csv('Metlin.csv')
+metlin = pandas.read_csv('mMetlin.csv')
 
 # Remove all rows with the molecule name 'Tm_XXX' where XXX are three numbers
 metlin_without_Tms = metlin[~metlin['Molecule Name'].str.contains("Tm_")]
