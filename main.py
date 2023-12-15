@@ -17,12 +17,13 @@ def compute_sverage_sd_and_plot_histogram(compounds, name):
 
 
 # Read the CSV file into a pandas DataFrame
-metlin = pd.read_csv('mMetlin.csv')
+metlin = pd.read_csv('resources/Metlin.csv')
 
 print("CSS average value and standard deviations:")
 print("All: average CSS:", metlin['CCS_AVG'].mean(),
       "Average standard deviation between runs of the same molecule, all compounds:",
       compute_sverage_sd_and_plot_histogram(metlin, "All"))
+
 met_h = metlin[metlin["Precursor Adduct"].str.contains("M+H", regex=False)].copy(deep=True)
 met_na = metlin[metlin["Precursor Adduct"].str.contains("M+Na", regex=False)].copy(deep=True)
 met_h_neg = metlin[metlin["Precursor Adduct"].str.contains("M-H", regex=False)].copy(deep=True)
