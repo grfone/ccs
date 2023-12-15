@@ -12,12 +12,33 @@ def compute_sverage_sd_and_plot_histogram(compounds, name):
     plt.figure(figsize=(24, 8))
     plt.hist(css_sd, bins=300)
     plt.title("Standard deviation of each molecule: " + name, fontsize=24)
-    plt.savefig("Sd of the CCS" + name + ".png")
+    plt.savefig("./results/Sd of the CCS" + name + ".png")
     return css_sd.mean()
 
 
 # Read the CSV file into a pandas DataFrame
 metlin = pd.read_csv('resources/Metlin.csv')
+
+
+# Dataframe correction
+def custom_function(row):
+    if row['Dimer.1'] == "Dimmer":
+        if row['Adduct'] == "[M+H]":
+            return (row['m/z']-1.00295)*2 + 1.00295
+        elif row['Adduct'] == "[M-H]":
+            return (row['m/z']+1.00295)*2 - 1.00295
+        elif row['Adduct'] == "[M+Na]":
+            return (row['m/z']-22.9892)*2 + 22.9892
+    else:
+        return row['m/z']
+
+
+# Apply the custom function to each row
+metlin['m/z'] = metlin.apply(custom_function, axis=1)
+
+for column in ['CCS1', 'CCS2', 'CCS3', 'CCS_AVG']:
+    metlin[column] = metlin[column] / metlin['m/z']
+
 
 print("CSS average value and standard deviations:")
 print("All: average CSS:", metlin['CCS_AVG'].mean(),
@@ -60,14 +81,14 @@ plt.scatter(metH_Hne["CCS_AVG_H+"], metH_Hne["CCS_AVG_H-"])
 plt.title("H+ vs H-")
 plt.xlabel("CCS_AVG_H+")
 plt.ylabel("CCS_AVG_H-")
-plt.savefig("H+ vs H-.png")
+plt.savefig("./results/H+ vs H-.png")
 
 plt.figure()
 plt.scatter(metH_Na["CCS_AVG_H+"], metH_Na["CCS_AVG_Na+"])
 plt.title("H+ vs Na+")
 plt.xlabel("CCS_AVG_H+")
 plt.ylabel("CCS_AVG_Na+")
-plt.savefig("H+ vs Na+.png")
+plt.savefig("./results/H+ vs Na+.png")
 
 plt.figure()
 metH_Na_gt_12 = metH_Na[metH_Na["CCS_AVG_H+"] > 1.2 * metH_Na["CCS_AVG_Na+"]]
@@ -75,7 +96,7 @@ plt.scatter(metH_Na_gt_12["CCS_AVG_H+"], metH_Na_gt_12["CCS_AVG_Na+"])
 plt.title("H+ vs Na+, H+ > 1.2 Na")
 plt.xlabel("CCS_AVG_H+")
 plt.ylabel("CCS_AVG_Na+")
-plt.savefig("H+ vs Na+, H+ > 1.2 Na.png")
+plt.savefig("./results/H+ vs Na+, H+ > 1.2 Na.png")
 
 plt.figure()
 metH_Hne_gt_12 = metH_Hne[metH_Hne["CCS_AVG_H+"] > 1.2 * metH_Hne["CCS_AVG_H-"]]
@@ -83,7 +104,7 @@ plt.scatter(metH_Hne_gt_12["CCS_AVG_H+"], metH_Hne_gt_12["CCS_AVG_H-"])
 plt.title("H+ vs H-, H+ > 1.2 H-")
 plt.xlabel("CCS_AVG_H+")
 plt.ylabel("CCS_AVG_H-")
-plt.savefig("H+ vs H-, H+ > 1.2 H-.png")
+plt.savefig("./results/H+ vs H-, H+ > 1.2 H-.png")
 
 plt.figure()
 metH_Na_gt_08 = metH_Na[metH_Na["CCS_AVG_H+"] < 0.8 * metH_Na["CCS_AVG_Na+"]]
@@ -91,7 +112,7 @@ plt.scatter(metH_Na_gt_08["CCS_AVG_H+"], metH_Na_gt_08["CCS_AVG_Na+"])
 plt.title("H+ vs Na+, H+ > 0.8 Na")
 plt.xlabel("CCS_AVG_H+")
 plt.ylabel("CCS_AVG_Na+")
-plt.savefig("H+ vs Na+, H+ > 0.8 Na.png")
+plt.savefig("./results/H+ vs Na+, H+ > 0.8 Na.png")
 
 plt.figure()
 metH_Hne_gt_08 = metH_Hne[metH_Hne["CCS_AVG_H+"] < 0.8 * metH_Hne["CCS_AVG_H-"]]
@@ -99,5 +120,5 @@ plt.scatter(metH_Hne_gt_08["CCS_AVG_H+"], metH_Hne_gt_08["CCS_AVG_H-"])
 plt.title("H+ vs H-, H+ > 0.8 H-")
 plt.xlabel("CCS_AVG_H+")
 plt.ylabel("CCS_AVG_H-")
-plt.savefig("H+ vs H-, H+ > 0.8 H-.png")
+plt.savefig("./results/H+ vs H-, H+ > 0.8 H-.png")
 
