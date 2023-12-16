@@ -13,11 +13,11 @@ def my_flags():
 
     # Add the -P or --preanalysis flag
     parser.add_argument('-P', '--preanalysis', action='store_true',
-                        help='perform preanalysis of the dataset')
+                        help='perform the preanalysis of the dataset')
 
     # Add the -N or --normalization flag
     parser.add_argument('-N', '--normalization', action='store_true',
-                        help='perform normalization on all of the CCS values in the dataset')
+                        help='use normalization during the preanalysis')
 
     return parser.parse_args()
 
