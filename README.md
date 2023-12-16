@@ -1,7 +1,7 @@
 # CCS PREDICTIONS
 
 Note that you may find additional options for running your experiments
-by consulting the `help` option of the Python scripts. E.g.:
+by consulting the `help` option of the main Python script:
 ```bash
 $(PYTHON_INTERPRETER) ccs/main.py --help
 # usage: main.py [-h] [-P] [-N]
