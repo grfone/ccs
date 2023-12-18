@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import gdown
 
 from utils.from_copied_link_to_download_link import transform_link
@@ -16,7 +17,7 @@ class Preanalysis:
         """
         self.metlin_df = self._load_data()
         self._remove_excess_columns_and_rows()
-        self._correct_mz_column()
+        # self._correct_mz_column()
         self.normalize_ccs_columns() if normalization_flag else None
         os.mkdir('results') if not os.path.exists('./results') else None
         os.mkdir('results/preanalysis_graphs') if not os.path.exists('./results/preanalysis_graphs') else None
@@ -204,6 +205,21 @@ class Preanalysis:
             plt.savefig(f"./results/preanalysis_graphs/Sd of the CCS {name}{suffix}.png")
             return css_sd.mean()
 
+        def plot_css_histogram(compounds, name, row):
+            """
+            Plot a histogram of collision cross section (CCS) values for a specific compound attribute.
+
+            Parameters:
+            - compounds (pd.DataFrame): DataFrame containing compound data.
+            - name (str): Name of the DataFrame passed as the first argument.
+            - row (str): Column name corresponding to the attribute for which the histogram is to be plotted.
+            """
+            ccs = compounds[[row]]
+            plt.figure(figsize=(24, 8))
+            plt.hist(ccs, bins=300)
+            plt.title("Css: " + name, fontsize=24)
+            plt.savefig(f"./results/preanalysis_graphs/CCS{suffix}" + name + row + ".png")
+
         print("CSS average value and standard deviations:")
         print("All: average CSS:", self.metlin_df['CCS_AVG'].mean(),
               "Average standard deviation between runs of the same molecule, all compounds:",
@@ -226,6 +242,64 @@ class Preanalysis:
         print("H+ and H-: average CSS", met_h_h_neg['CCS_AVG'].mean(),
               " standard deviation between runs of the same molecule, H+ and Na+:",
               compute_average_sd_and_plot_histogram(met_h_h_neg, "H+ and H-"))
+
+        dfs = {'metlin': self.metlin_df,
+               'met_h': met_h,
+               'met_na': met_na,
+               'met_h_neg': met_h_neg}
+        colnames = ['CCS1', 'CCS2', 'CCS3', 'CCS_AVG']
+
+        for df_name, df in dfs.items():
+            for colname in colnames:
+                plot_css_histogram(df, df_name, colname)
+
+        ccs = self.metlin_df['CCS1'] - self.metlin_df['CCS2']
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS1 -CSS2: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS1 _ CSS2{suffix}" + ".png")
+        ccs = ccs[ccs >= -1]
+        ccs = ccs[ccs <= 1]
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS1 -CSS2 0.5: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS1 _ CSS2 1{suffix}" + ".png")
+
+        ccs = self.metlin_df['CCS1'] - self.metlin_df['CCS3']
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS1 -CSS3: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS1 _ CSS3{suffix}" + ".png")
+        ccs = ccs[ccs >= -1]
+        ccs = ccs[ccs <= 1]
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS1 -CSS3 0.5: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS1 _ CSS3 1{suffix}" + ".png")
+
+        ccs = self.metlin_df['CCS2'] - self.metlin_df['CCS3']
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS2 -CSS3: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS2 _ CSS3{suffix}" + ".png")
+        ccs = ccs[ccs >= -1]
+        ccs = ccs[ccs <= 1]
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS2 -CSS3 0.5: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS2 _ CSS3 1{suffix}" + ".png")
+
+        ccs = self.metlin_df['CCS_AVG'] - self.metlin_df['CCS1']
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS_AVG -CSS1: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS_AVG _ CSS1{suffix}" + ".png")
+        ccs = ccs[ccs >= -1]
+        ccs = ccs[ccs <= 1]
+        plt.figure(figsize=(24, 8))
+        plt.hist(ccs, bins=300)
+        plt.title("CSS_AVG -CSS1 0.5: ", fontsize=24)
+        plt.savefig(f"./results/preanalysis_graphs/CSS_AVG _ CSS1 1{suffix}" + ".png")
 
         print(
             "\nAverage standard deviation between experiments of the same molecule with different adducts (H+, H-, Na+):",
@@ -287,3 +361,12 @@ class Preanalysis:
         plt.xlabel("CCS_AVG_H+")
         plt.ylabel("CCS_AVG_H-")
         plt.savefig(f"./results/preanalysis_graphs/H+ vs H-, H+ > 0.8 H-{suffix}.png")
+
+        # Code to check CCS_AVG
+        x = self.metlin_df['CCS_AVG'] - self.metlin_df[['CCS1', 'CCS2', 'CCS3']].mean(axis=1)
+        error = [x.abs() > 0.01]
+        print("Differences of more than 0.01: ", np.sum(error))
+        error = [x.abs() > 0.1]
+        print("Differences of more than 0.1: ", np.sum(error))
+        error = [x.abs() > 1]
+        print("Differences of more than 1: ", np.sum(error))

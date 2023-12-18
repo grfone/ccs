@@ -2,6 +2,7 @@ import os
 import argparse
 
 from src.preanalysis import Preanalysis
+from utils import get_descriptors_and_fingerprints
 
 
 def my_flags():
@@ -32,3 +33,7 @@ if __name__ == '__main__':
     and performs pre-analysis based on the provided flags.
     """
     my_preanalysis = Preanalysis(my_flags().normalization) if my_flags().preanalysis else None
+
+    # Note: ignore this by now
+    # get_descriptors_and_fingerprints.get_them_from_smiles_in_metlin(my_preanalysis.metlin_df) \
+    #    if not os.path.exists('./results/metlin_df.csv') else None
