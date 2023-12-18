@@ -176,6 +176,9 @@ class Preanalysis:
         # Plot the plot
         plt.savefig(f"./results/preanalysis_graphs/Monomer vs Dimer (different adducts){suffix}.png")
 
+        # Close all plot to free memory
+        plt.close('all')
+
     def do_second_set_of_plots(self, normalization_flag):
         """
         Generate and save the second set of plots based on CCS_AVG and m/z values.
@@ -198,16 +201,16 @@ class Preanalysis:
             Returns:
                 float: Average value of the standard deviation of the three CCS measurements of each compound.
             """
-            css_sd = compounds[['CCS1', 'CCS2', 'CCS3']].std(axis=1, skipna=True)
+            ccs_sd = compounds[['CCS1', 'CCS2', 'CCS3']].std(axis=1, skipna=True)
             plt.figure(figsize=(24, 8))
-            plt.hist(css_sd, bins=300)
+            plt.hist(ccs_sd, bins=300)
             plt.title("Standard deviation of each molecule: " + name, fontsize=24)
             plt.savefig(f"./results/preanalysis_graphs/Sd of the CCS {name}{suffix}.png")
-            return css_sd.mean()
+            return ccs_sd.mean()
 
-        def plot_css_histogram(compounds, name, row):
+        def plot_ccs_histogram(compounds, name, row):
             """
-            Plot a histogram of collision cross section (CCS) values for a specific compound attribute.
+            Plot a histogram of collision cross-section (CCS) values for a specific compound attribute.
 
             Parameters:
             - compounds (pd.DataFrame): DataFrame containing compound data.
@@ -218,7 +221,7 @@ class Preanalysis:
             plt.figure(figsize=(24, 8))
             plt.hist(ccs, bins=300)
             plt.title("Css: " + name, fontsize=24)
-            plt.savefig(f"./results/preanalysis_graphs/CCS{suffix}" + name + row + ".png")
+            plt.savefig(f"./results/preanalysis_graphs/CCS{name}{row}{suffix}.png")
 
         print("CSS average value and standard deviations:")
         print("All: average CSS:", self.metlin_df['CCS_AVG'].mean(),
@@ -243,6 +246,9 @@ class Preanalysis:
               " standard deviation between runs of the same molecule, H+ and Na+:",
               compute_average_sd_and_plot_histogram(met_h_h_neg, "H+ and H-"))
 
+        # Close all plot to free memory
+        plt.close('all')
+
         dfs = {'metlin': self.metlin_df,
                'met_h': met_h,
                'met_na': met_na,
@@ -251,7 +257,10 @@ class Preanalysis:
 
         for df_name, df in dfs.items():
             for colname in colnames:
-                plot_css_histogram(df, df_name, colname)
+                plot_ccs_histogram(df, df_name, colname)
+
+        # Close all plot to free memory
+        plt.close('all')
 
         ccs = self.metlin_df['CCS1'] - self.metlin_df['CCS2']
         plt.figure(figsize=(24, 8))
@@ -370,3 +379,6 @@ class Preanalysis:
         print("Differences of more than 0.1: ", np.sum(error))
         error = [x.abs() > 1]
         print("Differences of more than 1: ", np.sum(error))
+
+        # Close all plot to free memory
+        plt.close('all')
