@@ -18,6 +18,7 @@ class Preanalysis:
         self.metlin_df = self._load_data()
         self._remove_excess_columns_and_rows()
         # self._correct_mz_column()
+        self.add_error_columns_to_dataframe()
         self.normalize_ccs_columns() if normalization_flag else None
         os.mkdir('results') if not os.path.exists('./results') else None
         os.mkdir('results/preanalysis_graphs') if not os.path.exists('./results/preanalysis_graphs') else None
@@ -72,6 +73,16 @@ class Preanalysis:
 
         # Apply the correction function the m/z of all dimers because their m/z is 2M, not just M
         self.metlin_df['m/z'] = self.metlin_df.apply(mz_correction_function, axis=1)
+
+    def add_error_columns_to_dataframe(self):
+        # Add a column called error with the difference between the mean of 'CCS1', 'CCS2', 'CCS3', minus 'CCS_AVG'
+        self.metlin_df['error'] = self.metlin_df[['CCS1', 'CCS2', 'CCS3']].mean(axis=1) - self.metlin_df['CCS_AVG']
+        # Add a new column with the absolute value of the column 'error'
+        self.metlin_df['absolute_error'] = abs(self.metlin_df['error'])
+        # Sort the DataFrame based on the 'absolute_error' column in descending order
+        self.metlin_df.sort_values(by='absolute_error', ascending=False, inplace=True)
+        # Save the DataFrame with the two extra columns, ordered by its 'absolute_error' column values
+        self.metlin_df.to_csv('./results/Metlin_with_error_columns.csv', index=False)
 
     def normalize_ccs_columns(self):
         """
