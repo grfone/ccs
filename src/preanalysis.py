@@ -75,6 +75,10 @@ class Preanalysis:
         self.metlin_df['m/z'] = self.metlin_df.apply(mz_correction_function, axis=1)
 
     def add_error_columns_to_dataframe(self):
+        """
+        Calculate error-related metrics and add them as columns to the Metlin DataFrame. Save the updated DataFrame
+        into a file.
+        """
         # Add a column called error with the difference between the mean of 'CCS1', 'CCS2', 'CCS3', minus 'CCS_AVG'
         self.metlin_df['error'] = self.metlin_df[['CCS1', 'CCS2', 'CCS3']].mean(axis=1) - self.metlin_df['CCS_AVG']
         # Add a new column with the absolute value of the column 'error'
