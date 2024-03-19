@@ -223,7 +223,7 @@ class Preanalysis:
             plt.savefig(f"./results/preanalysis_graphs/Sd of the CCS {name}{suffix}.png")
             return ccs_sd.mean()
 
-        def plot_ccs_histogram(compounds, name, row):
+        def plot_ccs_histogram(compounds, name, column):
             """
             Plot a histogram of collision cross-section (CCS) values for a specific compound attribute.
 
@@ -232,11 +232,11 @@ class Preanalysis:
             - name (str): Name of the DataFrame passed as the first argument.
             - row (str): Column name corresponding to the attribute for which the histogram is to be plotted.
             """
-            ccs = compounds[[row]]
+            ccs = compounds[[column]]
             plt.figure(figsize=(24, 8))
             plt.hist(ccs, bins=300)
             plt.title("Css: " + name, fontsize=24)
-            plt.savefig(f"./results/preanalysis_graphs/CCS{name}{row}{suffix}.png")
+            plt.savefig(f"./results/preanalysis_graphs/CCS{name}{column}{suffix}.png")
 
         print("CSS average value and standard deviations:")
         print("All: average CSS:", self.metlin_df['CCS_AVG'].mean(),
@@ -280,7 +280,7 @@ class Preanalysis:
         ccs = self.metlin_df['CCS1'] - self.metlin_df['CCS2']
         plt.figure(figsize=(24, 8))
         plt.hist(ccs, bins=300)
-        plt.title("CSS1 -CSS2: ", fontsize=24)
+        plt.title("CSS1 - CSS2: ", fontsize=24)
         plt.savefig(f"./results/preanalysis_graphs/CSS1 _ CSS2{suffix}" + ".png")
         ccs = ccs[ccs >= -1]
         ccs = ccs[ccs <= 1]
@@ -292,13 +292,13 @@ class Preanalysis:
         ccs = self.metlin_df['CCS1'] - self.metlin_df['CCS3']
         plt.figure(figsize=(24, 8))
         plt.hist(ccs, bins=300)
-        plt.title("CSS1 -CSS3: ", fontsize=24)
+        plt.title("CSS1 - CSS3: ", fontsize=24)
         plt.savefig(f"./results/preanalysis_graphs/CSS1 _ CSS3{suffix}" + ".png")
         ccs = ccs[ccs >= -1]
         ccs = ccs[ccs <= 1]
         plt.figure(figsize=(24, 8))
         plt.hist(ccs, bins=300)
-        plt.title("CSS1 -CSS3 0.5: ", fontsize=24)
+        plt.title("CSS1 - CSS3 0.5: ", fontsize=24)
         plt.savefig(f"./results/preanalysis_graphs/CSS1 _ CSS3 1{suffix}" + ".png")
 
         ccs = self.metlin_df['CCS2'] - self.metlin_df['CCS3']

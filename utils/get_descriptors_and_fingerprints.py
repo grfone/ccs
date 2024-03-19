@@ -50,3 +50,23 @@ def get_them_from_smiles_in_metlin(metlin_df):
     metlin_df = pd.concat([metlin_df, descriptors_df, fingerprints_df], axis=1)
     # Save metlin_df
     metlin_df.to_csv('./results/metlin_df.csv', index=False)
+
+
+    # ---------------------------------------------
+    # |*** FROM HERE ONWARDS ALL IS TEMPORARY ****|
+    # ---------------------------------------------
+    # Just to use with Tino's code
+    import bz2
+    import pickle
+
+    descriptors_df['pid'] = range(len(metlin_df['CCS_AVG']))
+    descriptors_df['rt'] = metlin_df['CCS_AVG']
+    fingerprints_df['pid'] = range(len(metlin_df['CCS_AVG']))
+    fingerprints_df['rt'] = metlin_df['CCS_AVG']
+
+    fingerprints_df.to_csv('./results/CMM_vectorfingerprints.csv', index=False)
+    with bz2.BZ2File('./results/fingerprints.pklz', 'wb') as f:
+        pickle.dump(fingerprints_df, f)
+    with bz2.BZ2File('./results/descriptors.pklz', 'wb') as f:
+        pickle.dump(descriptors_df, f)
+
